@@ -1,7 +1,7 @@
 import gradio as gr
 import os
 import shutil
-from videocr_paddle import save_subtitles_to_file  # Changed to use videocr-PaddleOCR
+from videocr import save_subtitles_to_file  # Correct import
 import requests
 import urllib.parse
 from tqdm import tqdm
@@ -88,7 +88,7 @@ def list_files():
         print(f"Error listing files: {str(e)}")
         return []
 
-def run_video_ocr(video_source, video_url, input_video, output_file_name, language_code, start_time, end_time, confidence_threshold, similarity_threshold, frames_to_skip, crop_x, crop_y, crop_width, crop_height):
+def run_video_ocr(video_source, video_url, input_video, output_file_name, language_code, start_time, end_time, confidence_threshold, similarity_threshold, brightness_threshold, use_fullframe):
     try:
         # Ensure the output directory exists
         if not os.path.exists(DATA_DIR):
@@ -119,20 +119,17 @@ def run_video_ocr(video_source, video_url, input_video, output_file_name, langua
         # Define full path for the output file
         output_path = os.path.join(DATA_DIR, output_file_name)
 
-        # Save the subtitles to file using PaddleOCR version
+        # Save the subtitles to file with correct parameters
         save_subtitles_to_file(
             video_path,
             output_path,
             lang=language_code,
             time_start=start_time,
             time_end=end_time,
-            conf_threshold=confidence_threshold,
             sim_threshold=similarity_threshold,
-            frames_to_skip=frames_to_skip,
-            crop_x=crop_x,
-            crop_y=crop_y,
-            crop_width=crop_width,
-            crop_height=crop_height
+            conf_threshold=confidence_threshold,
+            brightness_threshold=brightness_threshold,
+            use_fullframe=use_fullframe
         )
 
         return f"Subtitle extraction completed! File saved to {output_path}"
@@ -175,13 +172,10 @@ def video_ocr_interface():
         with gr.Row():
             confidence_threshold = gr.Slider(label="Confidence Threshold", minimum=0, maximum=100, value=75)
             similarity_threshold = gr.Slider(label="Similarity Threshold", minimum=0, maximum=100, value=80)
-            frames_to_skip = gr.Slider(label="Frames to Skip", minimum=0, maximum=10, value=0)
+            brightness_threshold = gr.Slider(label="Brightness Threshold", minimum=0, maximum=255, value=210)
         
         with gr.Row():
-            crop_x = gr.Number(label="Crop X", value=0)
-            crop_y = gr.Number(label="Crop Y", value=0)
-            crop_width = gr.Number(label="Crop Width", value=0)
-            crop_height = gr.Number(label="Crop Height", value=0)
+            use_fullframe = gr.Checkbox(label="Use Full Frame", value=True)
 
         submit_btn = gr.Button("Start OCR")
         output_label = gr.Textbox(label="Status", interactive=False)
@@ -215,7 +209,7 @@ def video_ocr_interface():
                 video_source, video_url, input_video, output_file_name,
                 language_code, start_time, end_time,
                 confidence_threshold, similarity_threshold,
-                frames_to_skip, crop_x, crop_y, crop_width, crop_height
+                brightness_threshold, use_fullframe
             ],
             outputs=[output_label]
         ).success(fn=list_files, outputs=[file_list])
