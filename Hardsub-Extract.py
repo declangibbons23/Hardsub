@@ -1,7 +1,7 @@
 import gradio as gr
 import os
 import shutil
-from videocr import save_subtitles_to_file
+from videocr_paddle import save_subtitles_to_file  # Changed to use videocr-PaddleOCR
 import requests
 import urllib.parse
 from tqdm import tqdm
@@ -119,7 +119,7 @@ def run_video_ocr(video_source, video_url, input_video, output_file_name, langua
         # Define full path for the output file
         output_path = os.path.join(DATA_DIR, output_file_name)
 
-        # Save the subtitles to file
+        # Save the subtitles to file using PaddleOCR version
         save_subtitles_to_file(
             video_path,
             output_path,
@@ -175,9 +175,9 @@ def video_ocr_interface():
         with gr.Row():
             confidence_threshold = gr.Slider(label="Confidence Threshold", minimum=0, maximum=100, value=75)
             similarity_threshold = gr.Slider(label="Similarity Threshold", minimum=0, maximum=100, value=80)
+            frames_to_skip = gr.Slider(label="Frames to Skip", minimum=0, maximum=10, value=0)
         
         with gr.Row():
-            frames_to_skip = gr.Slider(label="Frames to Skip", minimum=0, maximum=10, value=0)
             crop_x = gr.Number(label="Crop X", value=0)
             crop_y = gr.Number(label="Crop Y", value=0)
             crop_width = gr.Number(label="Crop Width", value=0)
