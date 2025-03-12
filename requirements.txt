@@ -1,0 +1,6 @@
+git+https://github.com/devmaxxing/videocr-PaddleOCR.git
+paddlepaddle-gpu
+paddleocr
+numpy==1.25.2
+opencv-python
+gradio
