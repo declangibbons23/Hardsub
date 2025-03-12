@@ -88,7 +88,7 @@ def list_files():
         print(f"Error listing files: {str(e)}")
         return []
 
-def run_video_ocr(video_source, video_url, input_video, output_file_name, language_code, use_gpu, start_time, end_time, confidence_threshold, similarity_threshold, frames_to_skip, crop_x, crop_y, crop_width, crop_height):
+def run_video_ocr(video_source, video_url, input_video, output_file_name, language_code, start_time, end_time, confidence_threshold, similarity_threshold, frames_to_skip, crop_x, crop_y, crop_width, crop_height):
     try:
         # Ensure the output directory exists
         if not os.path.exists(DATA_DIR):
@@ -124,7 +124,6 @@ def run_video_ocr(video_source, video_url, input_video, output_file_name, langua
             video_path,
             output_path,
             lang=language_code,
-            use_gpu=use_gpu,
             time_start=start_time,
             time_end=end_time,
             conf_threshold=confidence_threshold,
@@ -168,7 +167,6 @@ def video_ocr_interface():
         with gr.Row():
             output_file_name = gr.Textbox(label="Output File Name (.srt)", value="subtitle.srt")
             language_code = gr.Textbox(label="Language Code", value="ch")
-            use_gpu = gr.Checkbox(label="Use GPU", value=True)
         
         with gr.Row():
             start_time = gr.Textbox(label="Start Time (HH:MM:SS)", value="00:00:00")
@@ -215,7 +213,7 @@ def video_ocr_interface():
             fn=run_video_ocr,
             inputs=[
                 video_source, video_url, input_video, output_file_name,
-                language_code, use_gpu, start_time, end_time,
+                language_code, start_time, end_time,
                 confidence_threshold, similarity_threshold,
                 frames_to_skip, crop_x, crop_y, crop_width, crop_height
             ],
